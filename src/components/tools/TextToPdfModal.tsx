@@ -57,7 +57,6 @@ Built with passion to elevate productivity and safeguard user security worldwide
       const filename = `ChetnaVikas_${title.replace(/[^a-zA-Z0-9]/g, '_') || 'TextDoc'}.pdf`;
 
       setDownloadReady({ bytes: pdfBytes, filename });
-      downloadPdfBlob(pdfBytes, filename);
       triggerConfetti();
     } catch (err: any) {
       console.error(err);

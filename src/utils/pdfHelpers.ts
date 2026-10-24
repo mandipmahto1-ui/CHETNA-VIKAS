@@ -206,40 +206,222 @@ export async function rotateAndWatermarkPdf(
 
   const rotationDeg = options.rotationDeg || 0;
   const watermarkText = options.watermarkText?.trim();
-  const opacity = options.opacity ?? 0.25;
-  const fontSize = options.fontSize ?? 44;
+  const opacity = options.opacity ?? 0.35;
   const watermarkAngle = options.watermarkAngle ?? 45;
 
-  let r = 0.4, g = 0.4, b = 0.4;
-  if (options.textColor === 'red') { r = 0.9; g = 0.1; b = 0.1; }
-  else if (options.textColor === 'blue') { r = 0.1; g = 0.4; b = 0.9; }
-  else if (options.textColor === 'emerald') { r = 0.05; g = 0.7; b = 0.4; }
+  let r = 0.3, g = 0.3, b = 0.3;
+  if (options.textColor === 'red') { r = 0.85; g = 0.15; b = 0.15; }
+  else if (options.textColor === 'blue') { r = 0.15; g = 0.4; b = 0.9; }
+  else if (options.textColor === 'emerald') { r = 0.05; g = 0.65; b = 0.35; }
   else if (options.textColor === 'amber') { r = 0.9; g = 0.55; b = 0.1; }
 
   pages.forEach((page) => {
+    // 1. Apply Rotation
     if (rotationDeg !== 0) {
       const currentRot = page.getRotation().angle;
       page.setRotation(degrees((currentRot + rotationDeg) % 360));
     }
 
+    // 2. Apply Watermark Overlay
     if (watermarkText) {
       const { width, height } = page.getSize();
-      const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
-      const textHeight = font.heightAtSize(fontSize);
+      // Responsive font size relative to page dimensions
+      const effectiveFontSize = options.fontSize || Math.max(32, Math.min(72, Math.round(width * 0.075)));
+      const textWidth = font.widthOfTextAtSize(watermarkText, effectiveFontSize);
+      const textHeight = font.heightAtSize(effectiveFontSize);
+
+      // Trigonometric centering calculation for text rotated at arbitrary angle around its origin
+      const rad = (watermarkAngle * Math.PI) / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      const x = width / 2 - (textWidth / 2) * cos + (textHeight / 2) * sin;
+      const y = height / 2 - (textWidth / 2) * sin - (textHeight / 2) * cos;
 
       page.drawText(watermarkText, {
-        x: width / 2 - textWidth / 2,
-        y: height / 2 - textHeight / 2,
-        size: fontSize,
-        font: font,
+        x,
+        y,
+        size: effectiveFontSize,
+        font,
         color: rgb(r, g, b),
-        opacity: opacity,
+        opacity: Math.max(0.2, opacity),
         rotate: degrees(watermarkAngle),
       });
     }
   });
 
   return await pdfDoc.save();
+}
+
+/**
+ * Add page numbers to each page of a PDF
+ */
+export async function addPageNumbersToPdf(
+  file: File,
+  options: {
+    format?: 'page_of_total' | 'simple' | 'bates';
+    position?: 'bottom-center' | 'bottom-right' | 'top-right';
+    prefix?: string;
+  } = {}
+): Promise<Uint8Array> {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const pages = pdfDoc.getPages();
+  const total = pages.length;
+  const format = options.format || 'page_of_total';
+  const position = options.position || 'bottom-center';
+  const prefix = options.prefix || '';
+
+  pages.forEach((page, idx) => {
+    const { width, height } = page.getSize();
+    const pageNum = idx + 1;
+    let text = `${pageNum}`;
+    if (format === 'page_of_total') {
+      text = `Page ${pageNum} of ${total}`;
+    } else if (format === 'bates') {
+      text = `${prefix}${String(pageNum).padStart(5, '0')}`;
+    }
+
+    const fontSize = 10;
+    const textWidth = font.widthOfTextAtSize(text, fontSize);
+
+    let x = width / 2 - textWidth / 2;
+    let y = 25;
+
+    if (position === 'bottom-right') {
+      x = width - textWidth - 35;
+      y = 25;
+    } else if (position === 'top-right') {
+      x = width - textWidth - 35;
+      y = height - 35;
+    }
+
+    page.drawText(text, {
+      x,
+      y,
+      size: fontSize,
+      font,
+      color: rgb(0.2, 0.25, 0.3),
+    });
+  });
+
+  return await pdfDoc.save();
+}
+
+/**
+ * Remove specific pages from a PDF document
+ */
+export async function removePagesFromPdf(
+  file: File,
+  pagesToRemoveStr: string
+): Promise<{ bytes: Uint8Array; removedCount: number }> {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const totalPages = pdfDoc.getPageCount();
+
+  const toRemove = new Set<number>();
+  const parts = pagesToRemoveStr.split(',').map((p) => p.trim());
+  for (const part of parts) {
+    if (part.includes('-')) {
+      const [startStr, endStr] = part.split('-');
+      const start = parseInt(startStr, 10);
+      const end = parseInt(endStr, 10);
+      if (!isNaN(start) && !isNaN(end)) {
+        for (let p = Math.min(start, end); p <= Math.max(start, end); p++) {
+          if (p >= 1 && p <= totalPages) toRemove.add(p - 1);
+        }
+      }
+    } else {
+      const p = parseInt(part, 10);
+      if (!isNaN(p) && p >= 1 && p <= totalPages) toRemove.add(p - 1);
+    }
+  }
+
+  if (toRemove.size === 0) {
+    throw new Error('Please specify valid page numbers to remove (e.g. 1, 3 or 2-4).');
+  }
+
+  if (toRemove.size >= totalPages) {
+    throw new Error('You cannot remove all pages from the document.');
+  }
+
+  // Remove from highest index to lowest so indices do not shift
+  const sortedDesc = Array.from(toRemove).sort((a, b) => b - a);
+  for (const idx of sortedDesc) {
+    pdfDoc.removePage(idx);
+  }
+
+  const bytes = await pdfDoc.save();
+  return { bytes, removedCount: sortedDesc.length };
+}
+
+/**
+ * Crop margins from all pages of a PDF
+ */
+export async function cropPdfPages(
+  file: File,
+  marginPt: number = 30
+): Promise<Uint8Array> {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const pages = pdfDoc.getPages();
+
+  pages.forEach((page) => {
+    const { width, height } = page.getSize();
+    const safeMarginX = Math.min(marginPt, width * 0.35);
+    const safeMarginY = Math.min(marginPt, height * 0.35);
+
+    page.setCropBox(
+      safeMarginX,
+      safeMarginY,
+      width - safeMarginX * 2,
+      height - safeMarginY * 2
+    );
+  });
+
+  return await pdfDoc.save();
+}
+
+/**
+ * Flatten form fields and interactive annotations
+ */
+export async function flattenPdfDocument(file: File): Promise<Uint8Array> {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  try {
+    const form = pdfDoc.getForm();
+    form.flatten();
+  } catch (e) {
+    // form might not exist or be empty
+  }
+  return await pdfDoc.save();
+}
+
+/**
+ * Compress and optimize PDF file structure
+ */
+export async function compressPdfFile(
+  file: File
+): Promise<{ bytes: Uint8Array; origSize: number; newSize: number; percent: number }> {
+  const arrayBuffer = await file.arrayBuffer();
+  const origSize = file.size;
+  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+
+  // Strip non-essential document metadata to reduce size
+  try {
+    pdfDoc.setTitle('');
+    pdfDoc.setAuthor('');
+    pdfDoc.setSubject('');
+    pdfDoc.setKeywords([]);
+  } catch (e) {
+    // ignore
+  }
+
+  const bytes = await pdfDoc.save({ useObjectStreams: true, addDefaultPage: false });
+  const newSize = bytes.length;
+  const percent = origSize > newSize ? Math.round(((origSize - newSize) / origSize) * 100) : 0;
+
+  return { bytes, origSize, newSize, percent };
 }
 
 /**

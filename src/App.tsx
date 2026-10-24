@@ -39,6 +39,7 @@ export const App: React.FC = () => {
 
   const [isRotateWatermarkOpen, setIsRotateWatermarkOpen] = useState(false);
   const [rotateFile, setRotateFile] = useState<File | undefined>(undefined);
+  const [activeRotateToolId, setActiveRotateToolId] = useState<string>('');
 
   const [isTextToPdfOpen, setIsTextToPdfOpen] = useState(false);
 
@@ -80,6 +81,7 @@ export const App: React.FC = () => {
         setIsImageToPdfOpen(true);
         break;
       case 'rotate-watermark':
+        setActiveRotateToolId(tool.id);
         setRotateFile(file);
         setIsRotateWatermarkOpen(true);
         break;
@@ -220,8 +222,10 @@ export const App: React.FC = () => {
         onClose={() => {
           setIsRotateWatermarkOpen(false);
           setRotateFile(undefined);
+          setActiveRotateToolId('');
         }}
         initialFile={rotateFile}
+        toolId={activeRotateToolId}
       />
 
       <TextToPdfModal

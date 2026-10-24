@@ -114,7 +114,6 @@ export const MergePdfModal: React.FC<MergePdfModalProps> = ({
 
       const filename = `ChetnaVikas_Merged_${Date.now()}.pdf`;
       setDownloadReady({ bytes: mergedBytes, filename });
-      downloadPdfBlob(mergedBytes, filename);
       triggerConfetti();
     } catch (err: any) {
       console.error(err);

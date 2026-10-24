@@ -16,24 +16,26 @@ interface RotateWatermarkModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialFile?: File;
+  toolId?: string;
 }
 
 export const RotateWatermarkModal: React.FC<RotateWatermarkModalProps> = ({
   isOpen,
   onClose,
   initialFile,
+  toolId,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pageCount, setPageCount] = useState<number>(0);
 
-  // Rotation states
-  const [rotationDeg, setRotationDeg] = useState<number>(0);
+  // Rotation states - default to +90deg if user clicked Rotate PDF
+  const [rotationDeg, setRotationDeg] = useState<number>(toolId === 'rotate-pdf' ? 90 : 0);
 
   // Watermark states
-  const [enableWatermark, setEnableWatermark] = useState<boolean>(true);
+  const [enableWatermark, setEnableWatermark] = useState<boolean>(toolId !== 'rotate-pdf');
   const [watermarkText, setWatermarkText] = useState<string>('CONFIDENTIAL');
-  const [watermarkColor, setWatermarkColor] = useState<string>('gray');
-  const [opacity, setOpacity] = useState<number>(0.25);
+  const [watermarkColor, setWatermarkColor] = useState<string>('red');
+  const [opacity, setOpacity] = useState<number>(0.35);
   const [fontSize, setFontSize] = useState<number>(44);
   const [watermarkAngle, setWatermarkAngle] = useState<number>(45);
 
@@ -47,6 +49,16 @@ export const RotateWatermarkModal: React.FC<RotateWatermarkModalProps> = ({
       handleFileSelected(initialFile);
     }
   }, [initialFile]);
+
+  React.useEffect(() => {
+    if (toolId === 'rotate-pdf') {
+      setRotationDeg(90);
+      setEnableWatermark(false);
+    } else if (toolId === 'add-watermark') {
+      setRotationDeg(0);
+      setEnableWatermark(true);
+    }
+  }, [toolId, isOpen]);
 
   if (!isOpen) return null;
 
@@ -69,6 +81,11 @@ export const RotateWatermarkModal: React.FC<RotateWatermarkModalProps> = ({
       return;
     }
 
+    if (rotationDeg === 0 && (!enableWatermark || !watermarkText.trim())) {
+      setErrorMsg('Please select a rotation angle (e.g. +90°) or enable a watermark so changes can be applied to the document.');
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setErrorMsg(null);
@@ -82,9 +99,8 @@ export const RotateWatermarkModal: React.FC<RotateWatermarkModalProps> = ({
         watermarkAngle,
       });
 
-      const filename = `ChetnaVikas_Edited_${selectedFile.name}`;
+      const filename = `ChetnaVikas_${rotationDeg !== 0 ? `Rotated_${rotationDeg}deg_` : ''}${selectedFile.name}`;
       setDownloadReady({ bytes: modifiedBytes, filename });
-      downloadPdfBlob(modifiedBytes, filename);
       triggerConfetti();
     } catch (err: any) {
       console.error(err);

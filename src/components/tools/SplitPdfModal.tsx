@@ -87,7 +87,6 @@ export const SplitPdfModal: React.FC<SplitPdfModalProps> = ({
         count: result.extractedCount,
       });
 
-      downloadPdfBlob(result.bytes, filename);
       triggerConfetti();
     } catch (err: any) {
       console.error(err);

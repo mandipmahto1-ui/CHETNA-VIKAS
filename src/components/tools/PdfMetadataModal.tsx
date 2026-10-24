@@ -73,7 +73,6 @@ export const PdfMetadataModal: React.FC<PdfMetadataModalProps> = ({
 
       const filename = `ChetnaVikas_Meta_${selectedFile.name}`;
       setDownloadReady({ bytes: modifiedBytes, filename });
-      downloadPdfBlob(modifiedBytes, filename);
       triggerConfetti();
     } catch (err: any) {
       console.error(err);

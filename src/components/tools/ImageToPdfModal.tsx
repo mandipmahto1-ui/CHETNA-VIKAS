@@ -121,7 +121,6 @@ export const ImageToPdfModal: React.FC<ImageToPdfModalProps> = ({
 
       const filename = `ChetnaVikas_Images_${Date.now()}.pdf`;
       setDownloadReady({ bytes: pdfBytes, filename });
-      downloadPdfBlob(pdfBytes, filename);
       triggerConfetti();
     } catch (err: any) {
       console.error(err);
