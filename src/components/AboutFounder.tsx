@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  AlertCircle,
   Award,
   Briefcase,
   Check,
@@ -9,6 +10,7 @@ import {
   ExternalLink,
   Globe,
   Languages,
+  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -27,6 +29,8 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -51,16 +55,50 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
     setTimeout(() => setCopiedPhone(false), 2500);
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       return;
     }
-    setFormSubmitted(true);
-    triggerConfetti();
-    setTimeout(() => {
-      setFormData({ name: '', email: '', subject: 'General Inquiry', message: '' });
-    }, 4500);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${founderEmail}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          Name: formData.name,
+          Email: formData.email,
+          Subject: formData.subject,
+          Message: formData.message,
+          _subject: `New Message on Chetna Vikas from ${formData.name}: ${formData.subject}`,
+          _replyto: formData.email,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && (data.success === 'true' || data.success === true)) {
+        setFormSubmitted(true);
+        triggerConfetti();
+        setFormData({ name: '', email: '', subject: 'General Inquiry', message: '' });
+      } else {
+        throw new Error(data.message || 'Failed to deliver message.');
+      }
+    } catch (err: any) {
+      console.error('Contact form error:', err);
+      setSubmitError(
+        'Unable to send message right now. Please verify your internet or email directly at ' +
+          founderEmail
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -708,20 +746,27 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
               <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h4 className="text-lg font-bold text-emerald-900">Message Received!</h4>
+              <h4 className="text-lg font-bold text-emerald-900">Message Delivered!</h4>
               <p className="text-xs text-emerald-700 max-w-sm mx-auto">
-                Thank you for reaching out! Mandip Kumar Mahto has received your note and will get back to you shortly.
+                Thank you! Your message has been sent directly to Mandip's inbox ({founderEmail}). You will receive a response shortly.
               </p>
               <button
                 type="button"
                 onClick={() => setFormSubmitted(false)}
-                className="mt-2 text-xs font-semibold text-emerald-700 underline cursor-pointer"
+                className="mt-2 text-xs font-semibold text-emerald-700 underline cursor-pointer hover:text-emerald-900 transition-colors"
               >
                 Send another message
               </button>
             </div>
           ) : (
             <form onSubmit={handleContactSubmit} className="space-y-4">
+              {submitError && (
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2 animate-fade-in">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-slate-700 block mb-1">
@@ -730,10 +775,11 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
                   <input
                     type="text"
                     required
+                    disabled={isSubmitting}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:bg-slate-100"
                   />
                 </div>
 
@@ -744,10 +790,11 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
                   <input
                     type="email"
                     required
+                    disabled={isSubmitting}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="e.g. rahul@example.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:bg-slate-100"
                   />
                 </div>
               </div>
@@ -757,9 +804,10 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
                   Topic / Purpose
                 </label>
                 <select
+                  disabled={isSubmitting}
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:bg-slate-100"
                 >
                   <option value="Job Opportunity">Job Opportunity / Hiring</option>
                   <option value="Web Development Project">Website / Front-End Project</option>
@@ -776,19 +824,32 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
                 <textarea
                   required
                   rows={4}
+                  disabled={isSubmitting}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Share details regarding your requirement or opportunity..."
-                  className="w-full p-3.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full p-3.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:bg-slate-100"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold text-sm shadow-md shadow-indigo-200 hover:shadow-lg hover:shadow-indigo-300 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className={`w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold text-sm shadow-md shadow-indigo-200 hover:shadow-lg hover:shadow-indigo-300 transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  isSubmitting ? 'opacity-80 cursor-wait' : ''
+                }`}
               >
-                <Send className="w-4 h-4" />
-                Send Message to Mandip
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending Message...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Send Message to Mandip
+                  </>
+                )}
               </button>
             </form>
           )}
