@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="url(#primaryGrad)" />
+  <!-- Folded Document Shape -->
+  <path d="M14 11C14 9.89543 14.8954 9 16 9H27L35 17V37C35 38.1046 34.1046 39 33 39H16C14.8954 39 14 38.1046 14 37V11Z" fill="#FFFFFF" fill-opacity="0.95" />
+  <path d="M26 9V16C26 16.5523 26.4477 17 27 17H34" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Accent Lines -->
+  <path d="M19 23H29" stroke="url(#primaryGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M19 28H27" stroke="url(#accentGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M19 33H24" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+  <!-- Sparkle -->
+  <path d="M37 7L38 10L41 11L38 12L37 15L36 12L33 11L36 10L37 7Z" fill="#FDE047"/>
+</svg>
