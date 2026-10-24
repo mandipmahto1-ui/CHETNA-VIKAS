@@ -1,7 +1,6 @@
 import React from 'react';
 import { ShieldCheck, ArrowUp } from 'lucide-react';
 import type { ToolCategory } from '../types';
-import { GithubIcon, LinkedinIcon, TwitterIcon } from './BrandIcons';
 
 interface FooterProps {
   onNavigate: (page: 'home' | 'founder') => void;
@@ -48,33 +47,6 @@ export const Footer: React.FC<FooterProps> = ({
             </p>
 
             <div className="flex items-center gap-3 pt-2">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                title="GitHub"
-              >
-                <GithubIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                title="LinkedIn"
-              >
-                <LinkedinIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                title="Twitter"
-              >
-                <TwitterIcon className="w-4 h-4" />
-              </a>
               <button
                 onClick={onOpenPrivacyModal}
                 className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
