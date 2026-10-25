@@ -4,6 +4,7 @@ import {
   Combine,
   Split,
   Layers,
+  LayoutGrid,
   Trash2,
   Crop,
   Shuffle,
@@ -30,6 +31,21 @@ import {
   ShieldAlert,
   FileCheck,
   Zap,
+  PlusCircle,
+  Presentation,
+  FileSpreadsheet,
+  FileUp,
+  Projector,
+  TableProperties,
+  ImagePlus,
+  Sparkles,
+  Languages,
+  SearchCheck,
+  Link,
+  Eraser,
+  Highlighter,
+  Shapes,
+  History,
 } from 'lucide-react';
 
 interface DynamicIconProps extends LucideProps {
@@ -44,6 +60,8 @@ export const DynamicIcon: React.FC<DynamicIconProps> = ({ name, ...props }) => {
       return <Split {...props} />;
     case 'Layers':
       return <Layers {...props} />;
+    case 'LayoutGrid':
+      return <LayoutGrid {...props} />;
     case 'Trash2':
       return <Trash2 {...props} />;
     case 'Crop':
@@ -94,6 +112,36 @@ export const DynamicIcon: React.FC<DynamicIconProps> = ({ name, ...props }) => {
       return <ShieldAlert {...props} />;
     case 'Zap':
       return <Zap {...props} />;
+    case 'PlusCircle':
+      return <PlusCircle {...props} />;
+    case 'Presentation':
+      return <Presentation {...props} />;
+    case 'FileSpreadsheet':
+      return <FileSpreadsheet {...props} />;
+    case 'FileUp':
+      return <FileUp {...props} />;
+    case 'Projector':
+      return <Projector {...props} />;
+    case 'TableProperties':
+      return <TableProperties {...props} />;
+    case 'ImagePlus':
+      return <ImagePlus {...props} />;
+    case 'Sparkles':
+      return <Sparkles {...props} />;
+    case 'Languages':
+      return <Languages {...props} />;
+    case 'SearchCheck':
+      return <SearchCheck {...props} />;
+    case 'Link':
+      return <Link {...props} />;
+    case 'Eraser':
+      return <Eraser {...props} />;
+    case 'Highlighter':
+      return <Highlighter {...props} />;
+    case 'Shapes':
+      return <Shapes {...props} />;
+    case 'History':
+      return <History {...props} />;
     default:
       return <FileCheck {...props} />;
   }

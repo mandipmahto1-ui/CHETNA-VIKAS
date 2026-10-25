@@ -12,9 +12,12 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@types/canvas-confetti": "^1.9.0",
+    "@types/jszip": "^3.4.0",
     "canvas-confetti": "^1.9.4",
+    "jszip": "^3.10.2",
     "lucide-react": "^1.61.0",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.4.299",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwindcss": "^4.3.3"
