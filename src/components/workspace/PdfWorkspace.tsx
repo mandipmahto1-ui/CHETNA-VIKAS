@@ -9,6 +9,8 @@ import { ThumbnailRail } from './ThumbnailRail';
 import { PdfCanvasViewport } from './PdfCanvasViewport';
 import { ContextualToolDrawer } from './ContextualToolDrawer';
 import { BottomActionBar } from './BottomActionBar';
+import { AllOperationsGrid } from './AllOperationsGrid';
+import { Footer } from '../Footer';
 import {
   loadPdfDocument,
   renderPageThumbnail,
@@ -37,7 +39,11 @@ import { bakeAnnotationsIntoPdf } from '../../utils/annotationBaker';
 import { PDFDocument } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 
-export const PdfWorkspace: React.FC = () => {
+interface PdfWorkspaceProps {
+  onNavigateFounder?: () => void;
+}
+
+export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder }) => {
   // Navigation & Tool Selection State
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -588,7 +594,33 @@ export const PdfWorkspace: React.FC = () => {
         )}
       </main>
 
-      {/* 5. Bottom Action Bar (Only visible when document is loaded) */}
+      {/* 5. All 30 Tools Cards Section Down Below */}
+      <AllOperationsGrid
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        onSelectOperation={(opId) => {
+          setActiveOperation(opId);
+        }}
+        hasDocument={!!currentPdfBytes}
+        onTriggerUpload={() => {
+          const el = document.querySelector('input[type="file"]') as HTMLInputElement;
+          el?.click();
+        }}
+      />
+
+      {/* 6. Footer with 'Developed by Mandip Kumar Mahto' */}
+      <Footer
+        onNavigate={(page) => {
+          if (page === 'founder') {
+            onNavigateFounder?.();
+          }
+        }}
+        onSelectOperation={(opId) => {
+          setActiveOperation(opId);
+        }}
+      />
+
+      {/* 7. Bottom Action Bar (Only visible when document is loaded) */}
       {currentPdfBytes && (
         <BottomActionBar
           canUndo={canUndo}
