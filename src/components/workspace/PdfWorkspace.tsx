@@ -9,7 +9,6 @@ import { ThumbnailRail } from './ThumbnailRail';
 import { PdfCanvasViewport } from './PdfCanvasViewport';
 import { ContextualToolDrawer } from './ContextualToolDrawer';
 import { BottomActionBar } from './BottomActionBar';
-import { generateRichSamplePdf } from '../../utils/samplePdfGenerator';
 import {
   loadPdfDocument,
   renderPageThumbnail,
@@ -131,13 +130,6 @@ export const PdfWorkspace: React.FC = () => {
       return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, searchQuery]);
-
-  // Handle loading sample document
-  const handleLoadSamplePdf = async () => {
-    const bytes = await generateRichSamplePdf();
-    await loadDocumentBytes(bytes, 'ChetnaVikas_Sample_Doc.pdf', true, 'Loaded 4-Page Sample PDF');
-    triggerConfetti();
-  };
 
   // Handle creating a blank PDF document
   const handleCreateBlankPdf = async () => {
@@ -521,7 +513,6 @@ export const PdfWorkspace: React.FC = () => {
           <div className="w-full flex items-center justify-center">
             <PreUploadDropzone
               onFilesSelected={handleFilesSelected}
-              onLoadSample={handleLoadSamplePdf}
               onCreateBlank={handleCreateBlankPdf}
             />
           </div>

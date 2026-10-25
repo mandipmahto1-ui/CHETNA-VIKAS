@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import {
   UploadCloud,
   FileText,
-  Sparkles,
   FileSpreadsheet,
   Presentation,
   Image as ImageIcon,
@@ -11,13 +10,12 @@ import {
 
 interface PreUploadDropzoneProps {
   onFilesSelected: (files: File[]) => void;
-  onLoadSample: () => void;
+  onLoadSample?: () => void;
   onCreateBlank: () => void;
 }
 
 export const PreUploadDropzone: React.FC<PreUploadDropzoneProps> = ({
   onFilesSelected,
-  onLoadSample,
   onCreateBlank,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -94,15 +92,6 @@ export const PreUploadDropzone: React.FC<PreUploadDropzoneProps> = ({
           >
             <UploadCloud className="w-4 h-4" />
             <span>Browse from Computer</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onLoadSample}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-sm border border-indigo-200/80 transition-all cursor-pointer hover:scale-[1.02]"
-          >
-            <Sparkles className="w-4 h-4 text-indigo-600" />
-            <span>Try with 4-Page Sample PDF</span>
           </button>
 
           <button
