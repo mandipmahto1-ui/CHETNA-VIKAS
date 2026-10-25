@@ -39,13 +39,13 @@ export const Footer: React.FC<FooterProps> = ({
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
-              <span className="text-xl font-black text-slate-900 tracking-tight">
+              <span className="font-chetna-vikas text-2xl font-black text-slate-900 tracking-tight">
                 Chetna{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600">
                   Vikas
                 </span>{' '}
-                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 uppercase tracking-widest">
-                  Studio
+                <span className="font-sans text-sm font-extrabold text-slate-700">
+                  PDF Editor
                 </span>
               </span>
             </div>
@@ -261,7 +261,7 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom Bar with Prominent "Developed by Mandip Kumar Mahto" */}
         <div className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Chetna Vikas PDF Studio. Zero server tracking.</p>
+          <p>© {new Date().getFullYear()} <span className="font-chetna-vikas font-bold">Chetna Vikas PDF Editor</span>. Zero server tracking.</p>
 
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200/90 text-slate-700 shadow-2xs font-medium">

@@ -48,7 +48,7 @@ export const Hero: React.FC<HeroProps> = ({
       const { PDFDocument } = await import('pdf-lib');
       const doc = await PDFDocument.create();
       const page = doc.addPage([595.28, 841.89]);
-      page.drawText('Sample Document for Chetna Vikas PDF Studio', { x: 50, y: 780, size: 18 });
+      page.drawText('Sample Document for Chetna Vikas PDF', { x: 50, y: 780, size: 18 });
       page.drawText('This sample PDF was generated right in your browser to test Split, Rotate, and Merge!', {
         x: 50,
         y: 740,
@@ -102,10 +102,9 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="max-w-4xl mx-auto space-y-4">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
             Empowering Your Documents with{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-              Chetna Vikas
-            </span>{' '}
-            PDF Studio
+            <span className="font-chetna-vikas text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600">
+              Chetna Vikas PDF Editor
+            </span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed">
             Fast, secure, and client-side PDF processing. Convert, merge, split, compress, and edit with zero server latency.

@@ -139,12 +139,12 @@ export async function translateDocumentText(
   };
 
   const sampleTranslations: Record<string, (t: string) => string> = {
-    hi: (t) => `[अनुवादित प्रति - ${langNames.hi}]\n\nयह दस्तावेज़ चेतना विकास स्टूडियो द्वारा अनुवादित किया गया है।\n\n${t}`,
-    es: (t) => `[Copia traducida al Español]\n\nEste documento ha sido traducido en el navegador con Chetna Vikas PDF Studio sin enviar datos al servidor.\n\n${t}`,
-    fr: (t) => `[Traduction en Français]\n\nCe document a été traduit localement avec une confidentialité totale dans Chetna Vikas PDF Studio.\n\n${t}`,
+    hi: (t) => `[अनुवादित प्रति - ${langNames.hi}]\n\nयह दस्तावेज़ चेतना विकास पीडीएफ एडिटर द्वारा अनुवादित किया गया है।\n\n${t}`,
+    es: (t) => `[Copia traducida al Español]\n\nEste documento ha sido traducido en el navegador con Chetna Vikas PDF Editor sin enviar datos al servidor.\n\n${t}`,
+    fr: (t) => `[Traduction en Français]\n\nCe document a été traduit localement avec une confidentialité totale dans Chetna Vikas PDF Editor.\n\n${t}`,
     de: (t) => `[Deutsche Übersetzung]\n\nDieses Dokument wurde lokal und sicher im Browser verarbeitet.\n\n${t}`,
-    ja: (t) => `[日本語翻訳]\n\nこのドキュメントは Chetna Vikas PDF Studio で安全にローカル処理されました。\n\n${t}`,
-    zh: (t) => `[中文翻译]\n\n此文档已通过 Chetna Vikas PDF Studio 在浏览器中安全处理。\n\n${t}`,
+    ja: (t) => `[日本語翻訳]\n\nこのドキュメントは Chetna Vikas PDF Editor で安全にローカル処理されました。\n\n${t}`,
+    zh: (t) => `[中文翻译]\n\n此文档已通过 Chetna Vikas PDF Editor 在浏览器中安全处理。\n\n${t}`,
   };
 
   const translator = sampleTranslations[targetLang] || ((t) => `[Translated to ${langNames[targetLang] || targetLang}]\n\n${t}`);

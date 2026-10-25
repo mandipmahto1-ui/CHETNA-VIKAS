@@ -1,10 +1,10 @@
 import type { PdfOperationMeta, ToolCategory } from '../types/workspace';
 
 export const TOOL_CATEGORIES: { id: ToolCategory; label: string; count: number }[] = [
-  { id: 'all', label: 'All Tools', count: 30 },
+  { id: 'all', label: 'All Tools', count: 28 },
   { id: 'organize', label: 'Organize & Pages', count: 8 },
   { id: 'convert', label: 'Convert & Export', count: 9 },
-  { id: 'edit', label: 'Edit & Annotate', count: 8 },
+  { id: 'edit', label: 'Edit & Annotate', count: 6 },
   { id: 'security-ai', label: 'Security & AI', count: 4 },
 ];
 
@@ -228,20 +228,5 @@ export const PDF_OPERATIONS: PdfOperationMeta[] = [
     description: 'Freehand drawing pen, highlighter with opacity controls, text strikeout, and underline.',
     iconName: 'Highlighter',
     isCanvasTool: true,
-  },
-  {
-    id: 'shapes',
-    name: 'Insert Shapes',
-    category: 'edit',
-    description: 'Insert rectangles, ellipses, lines, and callout arrows with stroke and fill configurations.',
-    iconName: 'Shapes',
-    isCanvasTool: true,
-  },
-  {
-    id: 'undo-history',
-    name: 'Undo / Redo History',
-    category: 'edit',
-    description: 'Global undo/redo history stack tracking all canvas modifications and page state operations.',
-    iconName: 'History',
   },
 ];

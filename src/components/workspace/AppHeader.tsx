@@ -44,15 +44,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black tracking-tight text-slate-900">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-chetna-vikas text-xl font-black tracking-tight text-slate-900">
                   Chetna
                 </span>
-                <span className="text-lg font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
+                <span className="font-chetna-vikas text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600">
                   Vikas
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 uppercase tracking-widest hidden sm:inline-block">
-                  Studio
+                <span className="text-xs font-extrabold text-slate-700 tracking-wide font-sans">
+                  PDF Editor
                 </span>
               </div>
               <p className="text-[10px] font-medium text-slate-400 tracking-wider uppercase -mt-0.5 hidden md:block">

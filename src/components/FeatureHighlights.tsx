@@ -88,13 +88,13 @@ export const FeatureHighlights: React.FC<FeatureHighlightsProps> = ({
               <tr className="border-b border-slate-200/80 bg-slate-50/70">
                 <th className="py-4 px-6 font-bold text-slate-700">Feature / Metric</th>
                 <th className="py-4 px-6 font-bold text-indigo-700 bg-indigo-50/80">
-                  <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-indigo-600" />
-                    Chetna Vikas Studio
+                  <span className="flex items-center gap-1.5 font-chetna-vikas text-sm font-bold text-pink-700">
+                    <CheckCircle2 className="w-4 h-4 text-pink-600" />
+                    Chetna Vikas PDF Editor
                   </span>
                 </th>
                 <th className="py-4 px-6 font-medium text-slate-500">iLovePDF</th>
-                <th className="py-4 px-6 font-medium text-slate-500">Sejda</th>
+                <th className="py-4 px-6 font-medium text-slate-500">Other Online Tools</th>
                 <th className="py-4 px-6 font-medium text-slate-500">Adobe Acrobat Online</th>
               </tr>
             </thead>

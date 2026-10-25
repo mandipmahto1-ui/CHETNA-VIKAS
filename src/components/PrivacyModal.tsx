@@ -23,7 +23,7 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) =
                 Privacy & Client-Side Architecture Guarantee
               </h3>
               <p className="text-xs text-slate-500">
-                100% local browser execution — Chetna Vikas PDF Studio
+                100% local browser execution — Chetna Vikas PDF Editor
               </p>
             </div>
           </div>

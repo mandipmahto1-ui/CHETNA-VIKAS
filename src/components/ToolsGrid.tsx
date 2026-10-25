@@ -40,7 +40,7 @@ export const ToolsGrid: React.FC<ToolsGridProps> = ({
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 uppercase tracking-widest mb-1">
             <Layers className="w-3.5 h-3.5" />
-            Complete PDF Studio Toolbox
+            Complete PDF Toolbox
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Every Tool You Need, Completely Client-Side

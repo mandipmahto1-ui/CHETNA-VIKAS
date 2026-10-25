@@ -122,7 +122,7 @@ export const GenericToolModal: React.FC<GenericToolModalProps> = ({
         // Non-PDF input (e.g. Word, Excel) - create PDF wrapper
         const pdfDoc = await PDFDocument.create();
         const page = pdfDoc.addPage([595.28, 841.89]);
-        const text = `Document converted with Chetna Vikas PDF Studio\nOriginal file: ${selectedFile.name}\nSize: ${formatBytes(selectedFile.size)}\nDate: ${new Date().toLocaleString()}`;
+        const text = `Document converted with Chetna Vikas PDF Editor\nOriginal file: ${selectedFile.name}\nSize: ${formatBytes(selectedFile.size)}\nDate: ${new Date().toLocaleString()}`;
         page.drawText(text, { x: 50, y: 750, size: 14 });
         outputBytes = await pdfDoc.save();
         filename = `${selectedFile.name.split('.')[0]}_converted.pdf`;

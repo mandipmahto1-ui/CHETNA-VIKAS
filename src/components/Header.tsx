@@ -73,19 +73,19 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-chetna-vikas text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                 Chetna
               </span>
-              <span className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
+              <span className="font-chetna-vikas text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 tracking-tight">
                 Vikas
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 uppercase tracking-widest hidden sm:inline-block">
-                Suite
+              <span className="text-xs font-bold text-slate-700 tracking-wide font-sans">
+                PDF Editor
               </span>
             </div>
             <p className="text-[10px] font-medium text-slate-500 tracking-wider uppercase -mt-0.5 hidden sm:block">
-              All-in-One Online PDF Studio
+              All-in-One Online PDF Editor
             </p>
           </div>
         </div>

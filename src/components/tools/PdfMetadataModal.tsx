@@ -49,9 +49,9 @@ export const PdfMetadataModal: React.FC<PdfMetadataModalProps> = ({
     }
     setSelectedFile(file);
     setTitle(file.name.replace(/\.pdf$/i, ''));
-    setAuthor('Chetna Vikas Studio');
+    setAuthor('Chetna Vikas PDF Editor');
     setSubject('Official Document');
-    setKeywords('PDF, Chetna Vikas, Verified');
+    setKeywords('PDF, Chetna Vikas PDF Editor, Verified');
   };
 
   const handleSave = async () => {

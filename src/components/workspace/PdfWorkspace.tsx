@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import type { ToolCategory, OperationId, AnnotationItem, DocumentSnapshot } from '../../types/workspace';
-import { PDF_OPERATIONS } from '../../data/operationsData';
-import { AppHeader } from './AppHeader';
-import { CategoryTabsBar } from './CategoryTabsBar';
-import { WorkspaceToolbar } from './WorkspaceToolbar';
-import { PreUploadDropzone } from './PreUploadDropzone';
-import { ThumbnailRail } from './ThumbnailRail';
-import { PdfCanvasViewport } from './PdfCanvasViewport';
+import { StudioHeader } from '../studio/StudioHeader';
+import { StudioMegaMenu } from '../studio/StudioMegaMenu';
+import { StudioLandingView } from '../studio/StudioLandingView';
+import { StudioEditorToolbar } from '../studio/StudioEditorToolbar';
+import { StudioContinuousViewport } from '../studio/StudioContinuousViewport';
+import { StudioDownloadModal } from '../studio/StudioDownloadModal';
+import { StudioFooter } from '../studio/StudioFooter';
+import { StudioSignModal } from '../studio/StudioSignModal';
+import { StudioPricingModal, StudioDesktopModal } from '../studio/StudioInfoModals';
 import { ContextualToolDrawer } from './ContextualToolDrawer';
-import { BottomActionBar } from './BottomActionBar';
-import { AllOperationsGrid } from './AllOperationsGrid';
-import { Footer } from '../Footer';
 import {
   loadPdfDocument,
-  renderPageThumbnail,
   extractTextFromPdf,
 } from '../../utils/pdfRenderer';
 import {
@@ -35,6 +33,7 @@ import {
   officeDocumentToPdf,
   findAndReplaceInPdf,
 } from '../../utils/pdfConverters';
+import { generateRichSamplePdf } from '../../utils/samplePdfGenerator';
 import { bakeAnnotationsIntoPdf } from '../../utils/annotationBaker';
 import { PDFDocument } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -46,24 +45,26 @@ interface PdfWorkspaceProps {
 export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder }) => {
   // Navigation & Tool Selection State
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeOperation, setActiveOperation] = useState<OperationId | null>(null);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<boolean>(false);
+  const [isSignModalOpen, setIsSignModalOpen] = useState<boolean>(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState<boolean>(false);
+  const [isDesktopModalOpen, setIsDesktopModalOpen] = useState<boolean>(false);
 
   // Document & PDF.js State
   const [currentPdfBytes, setCurrentPdfBytes] = useState<Uint8Array | null>(null);
   const [pdfDocProxy, setPdfDocProxy] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [currentFileName, setCurrentFileName] = useState<string>('');
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
-  const [pageThumbnails, setPageThumbnails] = useState<string[]>([]);
   const [extractedText, setExtractedText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [zoomScale, setZoomScale] = useState<number>(1.15);
 
   // In-Place Canvas Annotations State
   const [annotations, setAnnotations] = useState<AnnotationItem[]>([]);
-  const drawToolColor = '#ef4444';
-  const drawStrokeWidth = 3;
 
-  // History & Snapshot Stack for Global Undo / Redo (#30)
+  // History & Snapshot Stack for Global Undo / Redo
   const [historyStack, setHistoryStack] = useState<DocumentSnapshot[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
@@ -88,7 +89,7 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
     [historyIndex]
   );
 
-  // Reload PDF document, render thumbnails, and extract text
+  // Reload PDF document, render, and extract text
   const loadDocumentBytes = useCallback(
     async (bytes: Uint8Array, fileName: string, pushHistory = true, desc = 'Initial Document') => {
       setIsLoading(true);
@@ -98,14 +99,6 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
         setCurrentPdfBytes(bytes);
         setCurrentFileName(fileName);
         setCurrentPageIndex(0);
-
-        // Generate Thumbnails for all pages
-        const thumbs: string[] = [];
-        for (let i = 1; i <= doc.numPages; i++) {
-          const thumb = await renderPageThumbnail(doc, i, 160);
-          thumbs.push(thumb);
-        }
-        setPageThumbnails(thumbs);
 
         // Extract Text for AI & Search
         const { fullText } = await extractTextFromPdf(doc);
@@ -123,19 +116,19 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
     [pushHistorySnapshot]
   );
 
-  // Filter operations based on selected category and search query
-  const filteredOperations = useMemo(() => {
-    return PDF_OPERATIONS.filter((op) => {
-      const matchesCategory = selectedCategory === 'all' || op.category === selectedCategory;
-      const q = searchQuery.toLowerCase().trim();
-      const matchesSearch =
-        !q ||
-        op.name.toLowerCase().includes(q) ||
-        op.description.toLowerCase().includes(q) ||
-        op.id.includes(q);
-      return matchesCategory && matchesSearch;
-    });
-  }, [selectedCategory, searchQuery]);
+  // Load interactive demo sample PDF
+  const handleLoadSamplePdf = async () => {
+    setIsLoading(true);
+    try {
+      const sampleBytes = await generateRichSamplePdf();
+      await loadDocumentBytes(sampleBytes, 'Sample_Agreement_Brochure.pdf', true, 'Loaded Interactive Sample');
+      triggerConfetti();
+    } catch (err) {
+      console.error('Error loading sample pdf', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Handle creating a blank PDF document
   const handleCreateBlankPdf = async () => {
@@ -169,7 +162,6 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
     setCurrentPdfBytes(null);
     setPdfDocProxy(null);
     setCurrentFileName('');
-    setPageThumbnails([]);
     setAnnotations([]);
     setHistoryStack([]);
     setHistoryIndex(-1);
@@ -227,7 +219,9 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
         pages.forEach((p) => p.setRotation({ type: 'degrees', angle: (p.getRotation().angle + deg) % 360 } as any));
       } else {
         const p = pages[currentPageIndex];
-        p.setRotation({ type: 'degrees', angle: (p.getRotation().angle + deg) % 360 } as any);
+        if (p) {
+          p.setRotation({ type: 'degrees', angle: (p.getRotation().angle + deg) % 360 } as any);
+        }
       }
       const newBytes = await doc.save();
       await loadDocumentBytes(newBytes, currentFileName, true, `Rotated ${scope === 'all' ? 'All' : 'Page ' + (currentPageIndex + 1)} by ${deg}°`);
@@ -344,7 +338,6 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
   // 18. Protect PDF
   const handleProtectPdf = async (password: string) => {
     if (!currentPdfBytes) return;
-    // Bakes encrypted marker in client
     const doc = await PDFDocument.load(currentPdfBytes, { ignoreEncryption: true });
     doc.setTitle(`[Protected: ${password ? 'AES-256' : ''}] ${doc.getTitle() || currentFileName}`);
     const protectedBytes = await doc.save();
@@ -369,167 +362,212 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
     triggerConfetti();
   };
 
-  // Page reordering from thumbnail rail
+  // Page reordering
   const handleMovePage = async (fromIdx: number, toIdx: number) => {
     if (!currentPdfBytes || !pdfDocProxy) return;
     try {
       const srcDoc = await PDFDocument.load(currentPdfBytes, { ignoreEncryption: true });
       const newDoc = await PDFDocument.create();
       const pageIndices = srcDoc.getPageIndices();
-      // Swap order
       const item = pageIndices.splice(fromIdx, 1)[0];
       pageIndices.splice(toIdx, 0, item);
-
-      const copied = await newDoc.copyPages(srcDoc, pageIndices);
-      copied.forEach((p) => newDoc.addPage(p));
-
+      const copiedPages = await newDoc.copyPages(srcDoc, pageIndices);
+      copiedPages.forEach((p) => newDoc.addPage(p));
       const newBytes = await newDoc.save();
-      await loadDocumentBytes(newBytes, currentFileName, true, `Moved Page ${fromIdx + 1} to ${toIdx + 1}`);
-      setCurrentPageIndex(toIdx);
+      await loadDocumentBytes(newBytes, currentFileName, true, `Moved page ${fromIdx + 1} to position ${toIdx + 1}`);
     } catch (e) {
       console.error('Move page error', e);
     }
   };
 
-  // Duplicate page from thumbnail rail
-  const handleDuplicatePage = async (idx: number) => {
+  // Page duplicate
+  const handleDuplicatePage = async (pageIdx: number) => {
     if (!currentPdfBytes) return;
     try {
       const srcDoc = await PDFDocument.load(currentPdfBytes, { ignoreEncryption: true });
-      const newDoc = await PDFDocument.create();
-      const indices = srcDoc.getPageIndices();
-      // Insert duplicate index right after idx
-      indices.splice(idx + 1, 0, idx);
-
-      const copied = await newDoc.copyPages(srcDoc, indices);
-      copied.forEach((p) => newDoc.addPage(p));
-
-      const newBytes = await newDoc.save();
-      await loadDocumentBytes(newBytes, currentFileName, true, `Duplicated Page ${idx + 1}`);
+      const [copiedPage] = await srcDoc.copyPages(srcDoc, [pageIdx]);
+      srcDoc.insertPage(pageIdx + 1, copiedPage);
+      const newBytes = await srcDoc.save();
+      await loadDocumentBytes(newBytes, currentFileName, true, `Duplicated page ${pageIdx + 1}`);
       triggerConfetti();
     } catch (e) {
-      console.error('Duplicate error', e);
+      console.error('Duplicate page error', e);
     }
   };
 
-  // Apply Changes: Bakes active canvas annotations into current PDF bytes
-  const handleApplyChanges = async () => {
-    if (!currentPdfBytes || annotations.length === 0) return;
-    try {
-      const bakedBytes = await bakeAnnotationsIntoPdf(currentPdfBytes, annotations);
-      await loadDocumentBytes(bakedBytes, currentFileName, true, 'Committed annotations & changes');
-      setAnnotations([]);
-      triggerConfetti();
-    } catch (e) {
-      console.error('Bake error', e);
-    }
-  };
-
-  // Global Undo / Redo
+  // History Undo / Redo
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < historyStack.length - 1;
 
-  const handleUndo = async () => {
+  const handleUndo = () => {
     if (!canUndo) return;
-    const targetIdx = historyIndex - 1;
-    const snap = historyStack[targetIdx];
-    setHistoryIndex(targetIdx);
+    const newIdx = historyIndex - 1;
+    setHistoryIndex(newIdx);
+    const snap = historyStack[newIdx];
     setAnnotations([...snap.annotations]);
-    await loadDocumentBytes(snap.pdfBytes, snap.fileName, false);
+    loadDocumentBytes(snap.pdfBytes, snap.fileName, false);
   };
 
-  const handleRedo = async () => {
+  const handleRedo = () => {
     if (!canRedo) return;
-    const targetIdx = historyIndex + 1;
-    const snap = historyStack[targetIdx];
-    setHistoryIndex(targetIdx);
+    const newIdx = historyIndex + 1;
+    setHistoryIndex(newIdx);
+    const snap = historyStack[newIdx];
     setAnnotations([...snap.annotations]);
-    await loadDocumentBytes(snap.pdfBytes, snap.fileName, false);
+    loadDocumentBytes(snap.pdfBytes, snap.fileName, false);
   };
 
-  // Global Ctrl+Z / Ctrl+Y listeners
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        e.preventDefault();
-        if (e.shiftKey) handleRedo();
-        else handleUndo();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
-        e.preventDefault();
-        handleRedo();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  });
-
-  // Export / Download PDF
-  const handleExportPdf = async () => {
+  // Apply Changes (Bake annotations & show download modal)
+  const handleApplyChanges = async () => {
     if (!currentPdfBytes) return;
-    let finalBytes = currentPdfBytes;
-    if (annotations.length > 0) {
-      finalBytes = await bakeAnnotationsIntoPdf(currentPdfBytes, annotations);
+    try {
+      setIsLoading(true);
+      let bakedBytes = currentPdfBytes;
+      if (annotations.length > 0) {
+        bakedBytes = await bakeAnnotationsIntoPdf(currentPdfBytes, annotations);
+      }
+      await loadDocumentBytes(bakedBytes, currentFileName, true, 'Applied modifications & annotations');
+      setAnnotations([]);
+      setIsDownloadModalOpen(true);
+      triggerConfetti();
+    } catch (err) {
+      console.error('Error applying changes', err);
+    } finally {
+      setIsLoading(false);
     }
-    downloadPdfBlob(finalBytes, currentFileName || 'ChetnaVikas_Document.pdf');
+  };
+
+  // Download PDF
+  const handleDownloadPdf = () => {
+    if (!currentPdfBytes) return;
+    downloadPdfBlob(currentPdfBytes, currentFileName || 'Edited_Document.pdf');
     triggerConfetti();
   };
 
+  // Tool Selection Router
+  const handleSelectOperation = (opId: OperationId) => {
+    if (opId === 'add-signature') {
+      if (!currentPdfBytes) {
+        // Trigger file upload first
+        const el = document.querySelector('input[type="file"]') as HTMLInputElement;
+        el?.click();
+      } else {
+        setIsSignModalOpen(true);
+      }
+      return;
+    }
+
+    if (!currentPdfBytes) {
+      // If no document is open and user selects a tool, trigger file upload
+      const el = document.querySelector('input[type="file"]') as HTMLInputElement;
+      el?.click();
+      setActiveOperation(opId);
+      return;
+    }
+
+    // Toggle active operation
+    setActiveOperation((prev) => (prev === opId ? null : opId));
+  };
+
+  // Check if an operation requires the contextual drawer
+  const isDrawerOperation = useMemo(() => {
+    if (!activeOperation) return false;
+    return [
+      'rotate',
+      'crop',
+      'page-numbering',
+      'compress',
+      'protect',
+      'unlock',
+      'find-replace',
+      'ai-summarizer',
+      'translate',
+      'split',
+      'merge',
+      'pdf-to-word',
+      'pdf-to-pptx',
+      'pdf-to-excel',
+      'pdf-to-jpg',
+      'word-to-pdf',
+      'undo-history',
+    ].includes(activeOperation);
+  }, [activeOperation]);
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
-      {/* 1. Header & Navigation Bar */}
-      <AppHeader
+    <div className="min-h-screen bg-[#fdfbfd] flex flex-col justify-between selection:bg-pink-500 selection:text-white">
+      {/* 1. Top Navigation Bar */}
+      <StudioHeader
+        hasDocument={!!currentPdfBytes}
         fileName={currentFileName}
         pageCount={pdfDocProxy?.numPages}
-        fileSizeBytes={currentPdfBytes?.length}
-        hasUnsavedChanges={annotations.length > 0}
-        onReset={handleResetWorkspace}
+        onOpenMegaMenu={() => setIsMegaMenuOpen(true)}
+        isMegaMenuOpen={isMegaMenuOpen}
+        onSelectQuickTool={handleSelectOperation}
+        onResetDocument={handleResetWorkspace}
+        onOpenFounder={() => onNavigateFounder?.()}
+        onOpenPricing={() => setIsPricingModalOpen(true)}
+        onOpenDesktop={() => setIsDesktopModalOpen(true)}
       />
 
-      {/* 2. Top Category Tabs Bar */}
-      <CategoryTabsBar
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        totalFilteredCount={filteredOperations.length}
+      {/* 2. All Tools Mega Menu */}
+      <StudioMegaMenu
+        isOpen={isMegaMenuOpen}
+        onClose={() => setIsMegaMenuOpen(false)}
+        onSelectOperation={handleSelectOperation}
       />
 
-      {/* 3. Workspace Toolbar matching 30 operations */}
-      <WorkspaceToolbar
-        operations={filteredOperations}
-        activeOperation={activeOperation}
-        onSelectOperation={(opId) => {
-          setActiveOperation((prev) => (prev === opId ? null : opId));
-        }}
-      />
-
-      {/* 4. Central Workspace Area */}
-      <main className="flex-1 flex overflow-hidden relative min-h-[580px]">
-        {isLoading && (
-          <div className="absolute inset-0 bg-white/75 backdrop-blur-xs flex items-center justify-center z-50">
-            <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white shadow-xl border border-slate-200">
-              <span className="w-3 h-3 rounded-full bg-indigo-600 animate-ping" />
-              <span className="text-xs font-bold text-slate-800">Processing Document In Browser...</span>
-            </div>
+      {/* 3. Global Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-slate-900/30 backdrop-blur-2xs flex items-center justify-center z-50">
+          <div className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/95 backdrop-blur-md shadow-2xl border border-pink-200">
+            <span className="w-3 h-3 rounded-full bg-pink-500 animate-ping" />
+            <span className="text-xs font-bold text-slate-800">Processing Document in Browser...</span>
           </div>
-        )}
+        </div>
+      )}
 
+      {/* 4. Main Body: Pre-upload OR Document Editor */}
+      <main className="flex-1 flex flex-col relative">
         {!currentPdfBytes ? (
-          // Pre-upload State
-          <div className="w-full flex items-center justify-center">
-            <PreUploadDropzone
-              onFilesSelected={handleFilesSelected}
-              onCreateBlank={handleCreateBlankPdf}
-            />
-          </div>
+          // Landing View
+          <StudioLandingView
+            onFilesSelected={handleFilesSelected}
+            onLoadSample={handleLoadSamplePdf}
+            onCreateBlank={handleCreateBlankPdf}
+            onSelectOperation={handleSelectOperation}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
         ) : (
-          // Active State: Document Loaded
-          <div className="flex-1 flex overflow-hidden relative">
-            {/* Left Thumbnail Rail */}
-            <ThumbnailRail
-              pageThumbnails={pageThumbnails}
-              currentPageIndex={currentPageIndex}
-              onSelectPage={setCurrentPageIndex}
+          // PDF Editor View
+          <div className="flex-1 flex flex-col">
+            {/* Editor Toolbar */}
+            <StudioEditorToolbar
+              activeTool={activeOperation}
+              onSelectTool={handleSelectOperation}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              zoomScale={zoomScale}
+              onZoomIn={() => setZoomScale((s) => Math.min(2.0, +(s + 0.15).toFixed(2)))}
+              onZoomOut={() => setZoomScale((s) => Math.max(0.6, +(s - 0.15).toFixed(2)))}
+              onResetZoom={() => setZoomScale(1.15)}
+              currentPage={currentPageIndex}
+              totalPages={pdfDocProxy?.numPages || 1}
+              onNavigatePage={setCurrentPageIndex}
+            />
+
+            {/* Continuous Vertical Pages Viewport */}
+            <StudioContinuousViewport
+              pdfDoc={pdfDocProxy}
+              activeOperation={activeOperation}
+              annotations={annotations}
+              onAddAnnotation={(ann) => setAnnotations((prev) => [...prev, ann])}
+              onUpdateAnnotation={(updated) =>
+                setAnnotations((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+              }
+              onRemoveAnnotation={(id) => setAnnotations((prev) => prev.filter((a) => a.id !== id))}
               onRotatePage={(idx) => {
                 setCurrentPageIndex(idx);
                 handleRotate(90, 'current');
@@ -537,25 +575,16 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
               onDeletePage={(idx) => handleDeletePages([idx])}
               onDuplicatePage={handleDuplicatePage}
               onMovePage={handleMovePage}
-              onInsertBlankPage={() => handleInsertPage('after', true)}
+              onInsertBlankPage={(idx) => {
+                setCurrentPageIndex(idx);
+                handleInsertPage('after', true);
+              }}
+              onApplyChanges={handleApplyChanges}
+              scale={zoomScale}
             />
 
-            {/* Center Viewport Renderer & Annotation Layer */}
-            <PdfCanvasViewport
-              pdfDoc={pdfDocProxy}
-              currentPageIndex={currentPageIndex}
-              totalPages={pdfDocProxy?.numPages || 1}
-              activeOperation={activeOperation}
-              annotations={annotations}
-              onAddAnnotation={(ann) => setAnnotations((prev) => [...prev, ann])}
-              onRemoveAnnotation={(id) => setAnnotations((prev) => prev.filter((a) => a.id !== id))}
-              onSelectPage={setCurrentPageIndex}
-              drawToolColor={drawToolColor}
-              drawStrokeWidth={drawStrokeWidth}
-            />
-
-            {/* Contextual Action Drawer for the selected tool */}
-            {activeOperation && (
+            {/* Contextual Drawer for Advanced Tools */}
+            {isDrawerOperation && (
               <ContextualToolDrawer
                 operationId={activeOperation}
                 currentPageIndex={currentPageIndex}
@@ -594,47 +623,39 @@ export const PdfWorkspace: React.FC<PdfWorkspaceProps> = ({ onNavigateFounder })
         )}
       </main>
 
-      {/* 5. All 30 Tools Cards Section Down Below */}
-      <AllOperationsGrid
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-        onSelectOperation={(opId) => {
-          setActiveOperation(opId);
-        }}
-        hasDocument={!!currentPdfBytes}
-        onTriggerUpload={() => {
-          const el = document.querySelector('input[type="file"]') as HTMLInputElement;
-          el?.click();
-        }}
+      {/* 5. Multi-Column Footer */}
+      <StudioFooter
+        onSelectOperation={handleSelectOperation}
+        onNavigateFounder={() => onNavigateFounder?.()}
       />
 
-      {/* 6. Footer with 'Developed by Mandip Kumar Mahto' */}
-      <Footer
-        onNavigate={(page) => {
-          if (page === 'founder') {
-            onNavigateFounder?.();
-          }
-        }}
-        onSelectOperation={(opId) => {
-          setActiveOperation(opId);
-        }}
+      {/* 6. Signature Modal */}
+      <StudioSignModal
+        isOpen={isSignModalOpen}
+        onClose={() => setIsSignModalOpen(false)}
+        currentPageIndex={currentPageIndex}
+        onSaveSignature={(ann) => setAnnotations((prev) => [...prev, ann])}
       />
 
-      {/* 7. Bottom Action Bar (Only visible when document is loaded) */}
-      {currentPdfBytes && (
-        <BottomActionBar
-          canUndo={canUndo}
-          canRedo={canRedo}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onApplyChanges={handleApplyChanges}
-          onExportPdf={handleExportPdf}
-          onOpenHistory={() => setActiveOperation('undo-history')}
-          hasUnsavedChanges={annotations.length > 0}
-          pageCount={pdfDocProxy?.numPages || 1}
-          fileName={currentFileName}
-        />
-      )}
+      {/* 7. Download Ready Modal */}
+      <StudioDownloadModal
+        isOpen={isDownloadModalOpen}
+        fileName={currentFileName}
+        onClose={() => setIsDownloadModalOpen(false)}
+        onDownload={handleDownloadPdf}
+        onContinueEditing={() => setIsDownloadModalOpen(false)}
+        onStartNew={handleResetWorkspace}
+      />
+
+      {/* 8. Pricing & Desktop Info Modals */}
+      <StudioPricingModal
+        isOpen={isPricingModalOpen}
+        onClose={() => setIsPricingModalOpen(false)}
+      />
+      <StudioDesktopModal
+        isOpen={isDesktopModalOpen}
+        onClose={() => setIsDesktopModalOpen(false)}
+      />
     </div>
   );
 };

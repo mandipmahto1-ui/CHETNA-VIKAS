@@ -112,7 +112,7 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
           <span className="p-1.5 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
             ←
           </span>
-          Back to PDF Studio & Tools
+          Back to PDF Tools
         </button>
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-200/80 shadow-xs">
           <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
@@ -279,7 +279,7 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
             },
             {
               title: 'Web Suite Development',
-              desc: 'Pioneered custom client-side web utilities such as Chetna Vikas PDF Studio for privacy-first, zero-server document handling.',
+              desc: 'Pioneered custom client-side web utilities such as Chetna Vikas PDF for privacy-first, zero-server document handling.',
             },
           ].map((item, idx) => (
             <div
@@ -363,10 +363,10 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
                 <span className="text-xs font-semibold text-indigo-700">100% Client-Side</span>
               </div>
               <h3 className="text-lg font-bold text-slate-900">
-                Chetna Vikas Online PDF Studio
+                <span className="font-chetna-vikas text-xl font-bold">Chetna Vikas PDF Editor</span>
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                A browser-native productivity suite combining the features of iLovePDF and Sejda. Engineered with zero-server architecture so that documents never leave user devices.
+                A browser-native productivity suite providing military-grade private PDF tools. Engineered with zero-server architecture so that documents never leave user devices.
               </p>
               <ul className="space-y-2 text-xs text-slate-600">
                 <li className="flex items-start gap-2">
@@ -384,7 +384,7 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
               onClick={onBackToHome}
               className="mt-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm shadow-indigo-200"
             >
-              <span>Explore PDF Studio Tools</span>
+              <span>Explore PDF Tools</span>
               <Globe className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -812,7 +812,7 @@ export const AboutFounder: React.FC<AboutFounderProps> = ({ onBackToHome }) => {
                   <option value="Job Opportunity">Job Opportunity / Hiring</option>
                   <option value="Web Development Project">Website / Front-End Project</option>
                   <option value="MIS & Excel Automation">MIS & Excel Automation Consultation</option>
-                  <option value="PDF Studio Feature">Chetna Vikas PDF Tool Suggestion</option>
+                  <option value="PDF Feature">Chetna Vikas PDF Tool Suggestion</option>
                   <option value="General Inquiry">General Connect / Collaboration</option>
                 </select>
               </div>

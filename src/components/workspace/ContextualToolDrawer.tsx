@@ -119,7 +119,7 @@ export const ContextualToolDrawer: React.FC<ContextualToolDrawerProps> = ({
   const stampOpacity = 1;
   // #26 Signature
   const [sigMode, setSigMode] = useState<'draw' | 'type'>('draw');
-  const [typedSigName, setTypedSigName] = useState<string>('John Doe');
+  const [typedSigName, setTypedSigName] = useState<string>('Mandip');
   const sigCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isSigDrawing, setIsSigDrawing] = useState(false);
   // #27 Whiteout

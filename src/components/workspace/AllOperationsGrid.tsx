@@ -61,10 +61,10 @@ export const AllOperationsGrid: React.FC<AllOperationsGridProps> = ({
         };
       case 'security-ai':
         return {
-          bg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-          badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-          hoverBorder: 'hover:border-emerald-400 group-hover:shadow-emerald-500/10',
-          accent: 'text-emerald-600',
+          bg: 'bg-pink-50 text-pink-600 border-pink-100',
+          badge: 'bg-pink-50 text-pink-700 border-pink-200',
+          hoverBorder: 'hover:border-pink-400 group-hover:shadow-pink-500/15',
+          accent: 'text-pink-600',
         };
       default:
         return {
@@ -77,16 +77,16 @@ export const AllOperationsGrid: React.FC<AllOperationsGridProps> = ({
   };
 
   return (
-    <section id="all-30-tools" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
+    <section id="all-tools-grid" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
       {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200/80 pb-6">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100/90 text-indigo-700 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Complete 30-Tool PDF Studio</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 text-pink-600 text-xs font-bold uppercase tracking-wider shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-pink-500" />
+            <span>Complete PDF Suite</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Explore All 30 PDF Operations
+            Explore All PDF Operations
           </h2>
           <p className="text-sm text-slate-500 max-w-xl leading-relaxed">
             Every capability executes entirely client-side in your browser. Select any card below to launch its workspace controls directly.
@@ -104,13 +104,13 @@ export const AllOperationsGrid: React.FC<AllOperationsGridProps> = ({
                 onClick={() => onSelectCategory(cat.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                   isSelected
-                    ? 'bg-slate-900 text-white shadow-xs'
+                    ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
                     : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
                 }`}
               >
                 <span>{cat.label}</span>
                 <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                  isSelected ? 'bg-slate-800 text-slate-200' : 'bg-slate-100 text-slate-500'
+                  isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
                 }`}>
                   {cat.count}
                 </span>

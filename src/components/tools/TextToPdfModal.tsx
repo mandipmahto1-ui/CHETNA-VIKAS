@@ -21,7 +21,7 @@ export const TextToPdfModal: React.FC<TextToPdfModalProps> = ({
   const [title, setTitle] = useState('Official Documentation & Project Brief');
   const [content, setContent] = useState(
 `1. Introduction & Overview
-Chetna Vikas PDF Studio is an enterprise-grade, browser-based PDF suite designed to process documents entirely on the client side with 100% data confidentiality.
+Chetna Vikas PDF Editor is an enterprise-grade, browser-based PDF suite designed to process documents entirely on the client side with 100% data confidentiality.
 
 2. Architecture & Design Principles
 - Zero Server Latency: All PDF operations occur within your browser's local sandbox memory.
@@ -149,7 +149,7 @@ Built with passion to elevate productivity and safeguard user security worldwide
                 type="button"
                 onClick={() => {
                   setTitle('Chetna Vikas Quick Note');
-                  setContent('This is a quick formatted PDF note generated in Chetna Vikas PDF Studio.\nAll client-side and 100% private.');
+                  setContent('This is a quick formatted PDF note generated in Chetna Vikas PDF Editor.\nAll client-side and 100% private.');
                 }}
                 className="text-xs text-cyan-600 hover:underline cursor-pointer"
               >

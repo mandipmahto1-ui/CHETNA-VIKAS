@@ -17,7 +17,7 @@ export async function generateRichSamplePdf(): Promise<Uint8Array> {
     color: rgb(0.31, 0.27, 0.89), // Indigo 600
   });
 
-  page1.drawText('CHETNA VIKAS PDF STUDIO', {
+  page1.drawText('CHETNA VIKAS PDF EDITOR', {
     x: 48,
     y: 800,
     size: 22,
@@ -243,7 +243,7 @@ export async function generateRichSamplePdf(): Promise<Uint8Array> {
   });
 
   page4.drawText(
-    'Chetna Vikas PDF Studio was developed to give individuals, educators, and enterprise users\nunrivaled speed, zero server costs, and complete privacy.\n\nAll 30 PDF operations execute natively in your browser using modern WebAssembly, Canvas rendering,\nand client-side cryptographic and document assembly algorithms.\n\nThank you for choosing Chetna Vikas!',
+    'Chetna Vikas PDF Editor was developed to give individuals, educators, and enterprise users\nunrivaled speed, zero server costs, and complete privacy.\n\nAll 30 PDF operations execute natively in your browser using modern WebAssembly, Canvas rendering,\nand client-side cryptographic and document assembly algorithms.\n\nThank you for choosing Chetna Vikas PDF Editor!',
     {
       x: 48,
       y: 740,
