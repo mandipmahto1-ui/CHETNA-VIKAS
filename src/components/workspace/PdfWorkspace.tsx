@@ -485,11 +485,6 @@ export const PdfWorkspace: React.FC = () => {
         fileSizeBytes={currentPdfBytes?.length}
         hasUnsavedChanges={annotations.length > 0}
         onReset={handleResetWorkspace}
-        onLoadSample={handleLoadSamplePdf}
-        onTriggerUpload={() => {
-          const el = document.querySelector('input[type="file"]') as HTMLInputElement;
-          el?.click();
-        }}
       />
 
       {/* 2. Top Category Tabs Bar */}

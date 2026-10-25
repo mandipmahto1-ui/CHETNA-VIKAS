@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, FileText, Sparkles, Shield, UploadCloud } from 'lucide-react';
+import { RefreshCw, FileText } from 'lucide-react';
 
 interface AppHeaderProps {
   fileName?: string;
@@ -7,8 +7,8 @@ interface AppHeaderProps {
   fileSizeBytes?: number;
   hasUnsavedChanges?: boolean;
   onReset: () => void;
-  onLoadSample: () => void;
-  onTriggerUpload: () => void;
+  onLoadSample?: () => void;
+  onTriggerUpload?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -17,8 +17,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   fileSizeBytes,
   hasUnsavedChanges,
   onReset,
-  onLoadSample,
-  onTriggerUpload,
 }) => {
   const formattedSize = fileSizeBytes
     ? fileSizeBytes > 1024 * 1024
@@ -41,7 +39,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 alt="Chetna Vikas Logo"
                 className="w-full h-full object-contain"
                 onError={(e) => {
-                  // Fallback if logo.png not found
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
@@ -88,58 +85,20 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           )}
         </div>
 
-        {/* Global Action Header Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden lg:flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-3 py-1.5 rounded-xl font-medium">
-            <Shield className="w-3.5 h-3.5 text-emerald-600" />
-            <span>100% Private • Local Processing</span>
+        {/* Persistent Reset / New Document Button (when document is active) */}
+        {fileName && (
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onReset}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 transition-all cursor-pointer shadow-2xs hover:scale-[1.02]"
+              title="Clear current document and start over"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-rose-600" />
+              <span>Reset / New Document</span>
+            </button>
           </div>
-
-          {!fileName ? (
-            <>
-              <button
-                type="button"
-                onClick={onLoadSample}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer shadow-2xs hover:scale-[1.02]"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Try Sample PDF</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={onTriggerUpload}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 transition-all cursor-pointer hover:scale-[1.02]"
-              >
-                <UploadCloud className="w-3.5 h-3.5" />
-                <span>Upload PDF</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={onLoadSample}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200/70 text-slate-700 transition-colors cursor-pointer"
-                title="Switch to Sample 4-page PDF"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Sample PDF</span>
-              </button>
-
-              {/* Persistent Reset / New Document Button */}
-              <button
-                type="button"
-                onClick={onReset}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 transition-all cursor-pointer shadow-2xs hover:scale-[1.02]"
-                title="Clear current document and start over"
-              >
-                <RefreshCw className="w-3.5 h-3.5 text-rose-600" />
-                <span>Reset / New Document</span>
-              </button>
-            </>
-          )}
-        </div>
+        )}
       </div>
     </header>
   );
